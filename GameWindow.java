@@ -5,6 +5,8 @@ import java.awt.event.KeyListener;
 
 public class GameWindow extends JFrame {
 
+    // singleton
+
     private static int widthWindow = 800;
     private static int heightWindow = 600;
 

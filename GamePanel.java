@@ -1,8 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.util.Iterator;
 import java.util.List;
 
@@ -26,7 +24,7 @@ public class GamePanel extends JPanel{
         setFocusable(true);
         requestFocusInWindow();
 
-        // Definiowanie akcji
+        // Definiowanie akcji // wzorzec komenda
         Action moveLeftAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -128,31 +126,13 @@ public class GamePanel extends JPanel{
                 }
             }
 
-
-//            for (Point point : points) {
-//                if (point.checkCollision(character.x, character.y)) {
-//                    if (levelNumber == 1) {
-//                        lvl1.erasePoint(point);
-//                        pointCount++;
-//                    }
-//                    if (levelNumber == 2) {
-//                        lvl2.erasePoint(point);
-//                        pointCount++;
-//                    }
-//                    if (levelNumber == 3) {
-//                        lvl3.erasePoint(point);
-//                        pointCount++;
-//                    }
-//
-//                }
-//            }
+            // zbieranie punktów / iterator
             Iterator<Point> pointIterator = points.iterator();
             while (pointIterator.hasNext()) {
                 Point point = pointIterator.next();
                 if (point.checkCollision(character.x, character.y)) {
                     pointIterator.remove();  // Bezpieczne usunięcie punktu
                     pointCount++;
-                    // Możesz tutaj dodać dodatkową logikę, jeśli jest potrzebna
                 }
             }
 

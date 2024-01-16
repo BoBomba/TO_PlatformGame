@@ -20,7 +20,7 @@ public class Point {
         int distanceX = Math.abs(x - this.x); // Odległość w osi X
         int distanceY = Math.abs(y - this.y); // Odległość w osi Y
 
-        // Prosty test kolizji: czy odległość między środkami jest mniejsza niż suma promieni
+        // Prosty test kolizji
         int radiusSum = this.radius;
         return distanceX <= radiusSum && distanceY <= radiusSum;
     }

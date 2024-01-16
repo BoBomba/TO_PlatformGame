@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 public class Level {
 
+    // mozliwe zastosowanie fabryki do tworzenia np. roznych poziomow
+
     private static int levelNumber;
 
     private List<Platform> platforms;
@@ -14,9 +16,6 @@ public class Level {
         platforms = new ArrayList<>();
         points = new ArrayList<>();
         this.levelNumber = levelNumber;
-        //enemies = new ArrayList<>();
-        //bonuses = new ArrayList<>();
-        // Inicjalizacja poziomu z odpowiednimi elementami
     }
 
     public void addPlatform(Platform platform) {
@@ -39,8 +38,6 @@ public class Level {
     public void loadLevel(GamePanel gamePanel) {
         gamePanel.setPlatforms(platforms);
         gamePanel.setPoints(points);
-        Iterator<Point> iterator = points.iterator();
-        // Tutaj możesz ustawić również wrogów, bonusy itp.
     }
 
 }

@@ -1,6 +1,8 @@
 import java.awt.Color;
 import java.awt.Graphics;
 
+// dekorator
+
 public class KillingPlatformDecorator extends Platform {
     private Platform decoratedPlatform;
 

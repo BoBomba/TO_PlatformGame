@@ -4,7 +4,7 @@ import java.util.List;
 public class Character {
     int x, y;
     int width, height;
-    int xVelocity, yVelocity;
+    int xVelocity, yVelocity; //strategia ??
     boolean onGround;
 
     Color color = Color.pink;
@@ -23,7 +23,6 @@ public class Character {
     }
 
     public void update(List<Platform> platforms) {
-        //System.out.println("Updating character: x=" + x + ", y=" + y);
 
         x += xVelocity;
         y += yVelocity;

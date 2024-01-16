@@ -5,6 +5,4 @@ public class EndPoint extends Point {
         super(x, y);
         this.color = Color.YELLOW; // Złoty kolor
     }
-
-
 }
