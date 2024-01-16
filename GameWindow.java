@@ -1,37 +1,35 @@
-import javax.swing.*;
-import java.awt.*;
-import java.util.Scanner;
-private static class GameWindow extends JPanel {
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
+import javax.swing.JFrame;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
-        // Rysuj planszę gry
-        for (int x = 0; x < grid.length; x++) {
-            for (int y = 0; y < grid[x].length; y++) {
-                int squareSize = 30;
-                int xOffset = 50;
-                int yOffset = 50;
+public class GameWindow extends JFrame {
 
-                if (grid[x][y].equals("@")) {
-                    g.setColor(Color.BLUE);
-                    g.fillRect(y * squareSize + xOffset, x * squareSize + yOffset, squareSize, squareSize);
-                } else if (grid[x][y].equals("x")) {
-                    g.setColor(Color.RED);
-                    g.fillRect(y * squareSize + xOffset, x * squareSize + yOffset, squareSize, squareSize);
-                } else if (grid[x][y].equals("!")) {
-                    g.setColor(Color.GREEN);
-                    g.fillRect(y * squareSize + xOffset, x * squareSize + yOffset, squareSize, squareSize);
-                } else if (grid[x][y].equals("-")) {
-                    g.setColor(Color.GRAY);
-                    g.fillRect(y * squareSize + xOffset, x * squareSize + yOffset, squareSize, squareSize);
-                }
-                g.setColor(Color.BLACK);
-                g.drawRect(y * squareSize + xOffset, x * squareSize + yOffset, squareSize, squareSize);
-            }
-        }
+    private static int widthWindow = 800;
+    private static int heightWindow = 600;
+
+    public GameWindow() {
+        this.setTitle("2D Platform Game");
+        this.setSize(widthWindow, heightWindow);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setLocationRelativeTo(null); // Centruje okno
+
+        StartScreen startScreen = new StartScreen(this);
+        this.add(startScreen);
+        this.setVisible(true);
+        startScreen.requestFocusInWindow();
+
     }
-}
 
-// Reszta kodu pozostaje bez zmian
+    public static int getWidthWindow() {
+        return widthWindow;
+    }
+
+    public static int getHeightWindow() {
+        return heightWindow;
+    }
+
+    public static void main(String[] args) {
+        new GameWindow();
+    }
 }
