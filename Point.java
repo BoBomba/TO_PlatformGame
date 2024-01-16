@@ -24,4 +24,29 @@ public class Point {
         int radiusSum = this.radius;
         return distanceX <= radiusSum && distanceY <= radiusSum;
     }
+
+    public boolean checkCollision(Character character) {
+
+        int centerX = character.x + character.width / 2; // Środek postaci w osi X
+        int centerY = character.y + character.height / 2; // Środek postaci w osi Y
+
+        int distanceX = Math.abs(centerX - this.x); // Odległość w osi X
+        int distanceY = Math.abs(centerY - this.y); // Odległość w osi Y
+
+        // Prosty test kolizji
+        int radiusSum = this.radius + Math.min(character.width, character.height) / 2;
+        return distanceX <= radiusSum && distanceY <= radiusSum;
+    }
+
+    public static boolean checkCollision(Character character, Point point) {
+        int centerX = character.x + character.width / 2; // Środek postaci w osi X
+        int centerY = character.y + character.height / 2; // Środek postaci w osi Y
+
+        int distanceX = Math.abs(centerX - point.x); // Odległość w osi X
+        int distanceY = Math.abs(centerY - point.y); // Odległość w osi Y
+
+        // Prosty test kolizji: czy odległość między środkami jest mniejsza niż suma promieni
+        int radiusSum = point.radius + Math.min(character.width, character.height) / 2;
+        return distanceX <= radiusSum && distanceY <= radiusSum;
+    }
 }

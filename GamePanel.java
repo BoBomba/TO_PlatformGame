@@ -53,12 +53,20 @@ public class GamePanel extends JPanel{
             }
         };
 
+        Action stopJumpAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                character.stopJump();
+            }
+        };
+
         // Mapowanie klawiszy
         bindKeyStrokeToAction("LEFT", moveLeftAction);
         bindKeyStrokeToAction("RIGHT", moveRightAction);
         bindKeyStrokeToAction("UP", jumpAction);
         bindKeyStrokeToAction("released LEFT", stopAction);
         bindKeyStrokeToAction("released RIGHT", stopAction);
+        bindKeyStrokeToAction("released UP", stopJumpAction);
 
 
         //Edytor leveli
@@ -117,12 +125,7 @@ public class GamePanel extends JPanel{
                     levelNumber++;
                 }
                 else {
-                    JFrame endFrame = new JFrame("Koniec Gry");
-                    endFrame.setContentPane(new EndScreen(pointCount));
-                    endFrame.pack();
-                    endFrame.setVisible(true);
-                    endFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                    return;
+                    endPoint.ending(pointCount);
                 }
             }
 
@@ -130,21 +133,20 @@ public class GamePanel extends JPanel{
             Iterator<Point> pointIterator = points.iterator();
             while (pointIterator.hasNext()) {
                 Point point = pointIterator.next();
-                if (point.checkCollision(character.x, character.y)) {
-                    pointIterator.remove();  // Bezpieczne usunięcie punktu
-                    pointCount++;
+                if (point.checkCollision(character)) {
+                    if (point instanceof EndPoint) {
+                        // Logika końca gry dla EndPoint
+                        endPoint.ending(pointCount);
+                        return; // Zakończ pętlę i timer, jeśli dotknięto EndPoint
+                    } else {
+                        // Logika dla zwykłego punktu
+                        pointIterator.remove();  // Bezpieczne usunięcie punktu
+                        pointCount++;
+                    }
                 }
             }
 
 
-            if (endPoint.checkCollision(character.x, character.y)) {
-                JFrame endFrame = new JFrame("Koniec Gry");
-                endFrame.setContentPane(new EndScreen(pointCount));
-                endFrame.pack();
-                endFrame.setVisible(true);
-                endFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                return;
-            }
             repaint();
         });
         timer.start();

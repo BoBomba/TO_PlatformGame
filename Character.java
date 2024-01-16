@@ -1,4 +1,6 @@
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.List;
 
 public class Character {
@@ -6,6 +8,10 @@ public class Character {
     int width, height;
     int xVelocity, yVelocity; //strategia ??
     boolean onGround;
+
+    private boolean movingLeft = false;
+    private boolean movingRight = false;
+    private boolean jumping = false;
 
     Color color = Color.pink;
 
@@ -23,6 +29,19 @@ public class Character {
     }
 
     public void update(List<Platform> platforms) {
+
+        if (movingLeft) {
+            xVelocity = -5;
+        } else if (movingRight) {
+            xVelocity = 5;
+        } else {
+            xVelocity = 0;
+        }
+
+        if (jumping && onGround) {
+            yVelocity = -15; // Wartość skoku
+            onGround = false;
+        }
 
         x += xVelocity;
         y += yVelocity;
@@ -77,23 +96,45 @@ public class Character {
         this.onGround = false;
     }
 
+//    public void moveLeft() {
+//        xVelocity = -5;
+//    }
+//
+//    public void moveRight() {
+//        xVelocity = 5;
+//    }
+//
+//    public void stop() {
+//        xVelocity = 0;
+//    }
+//
+//    public void jump() {
+//        if (onGround) {
+//            yVelocity = -15; // Wartość skoku
+//            onGround = false;
+//        }
+//    }
+
     public void moveLeft() {
-        xVelocity = -5;
+        movingLeft = true;
     }
 
     public void moveRight() {
-        xVelocity = 5;
+        movingRight = true;
     }
 
     public void stop() {
-        xVelocity = 0;
+        movingLeft = false;
+        movingRight = false;
     }
 
     public void jump() {
-        if (onGround) {
-            yVelocity = -15; // Wartość skoku
-            onGround = false;
-        }
+        jumping = true;
+    }
+
+    // Wywoływane, gdy klawisz skoku zostanie zwolniony
+    public void stopJump() {
+        jumping = false;
     }
 
 }
