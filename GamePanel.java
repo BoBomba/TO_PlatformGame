@@ -8,7 +8,7 @@ public class GamePanel extends JPanel{
     private Character character;
     private Memento initialPosition;
     private List<Platform> platforms;
-
+    private int elapsedTime = 0;
     private List<Point> points;
 
 
@@ -102,7 +102,9 @@ public class GamePanel extends JPanel{
         //lvl3.loadLevel(this);
         //levelNumber = 3;
 
-        Timer timer = new Timer(16, e -> {
+        Timer[] timer = new Timer[1];
+
+        timer[0] = new Timer(16, e -> {
             character.update(platforms);
             if (character.y > GameWindow.getHeightWindow()-30) {
                 character.getStateFromMemento(initialPosition);
@@ -125,7 +127,8 @@ public class GamePanel extends JPanel{
                     levelNumber++;
                 }
                 else {
-                    endPoint.ending(pointCount);
+                    timer[0].stop();
+                    endPoint.ending(pointCount, elapsedTime);
                 }
             }
 
@@ -136,7 +139,7 @@ public class GamePanel extends JPanel{
                 if (point.checkCollision(character)) {
                     if (point instanceof EndPoint) {
                         // Logika końca gry dla EndPoint
-                        endPoint.ending(pointCount);
+                        endPoint.ending(pointCount, elapsedTime);
                         return; // Zakończ pętlę i timer, jeśli dotknięto EndPoint
                     } else {
                         // Logika dla zwykłego punktu
@@ -146,10 +149,11 @@ public class GamePanel extends JPanel{
                 }
             }
 
+            elapsedTime += 16;
 
             repaint();
         });
-        timer.start();
+        timer[0].start();
     }
 
     public void setPlatforms(List<Platform> platforms) {
@@ -163,6 +167,20 @@ public class GamePanel extends JPanel{
     private void bindKeyStrokeToAction(String keyStroke, Action action) {
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(keyStroke), keyStroke);
         getActionMap().put(keyStroke, action);
+    }
+
+    public void drawPointsSidebar(Graphics g) {
+        g.setColor(new Color(0, 0, 0, 0)); // Set color to transparent
+        int sidebarWidth = 100;
+        int sidebarHeight = 50;
+        int sidebarX = GameWindow.getWidthWindow() - sidebarWidth; // Position the sidebar on the right
+        int sidebarY = 0; // Position the sidebar at the top
+        g.fillRect(sidebarX, sidebarY, sidebarWidth, sidebarHeight); // Draw the sidebar
+
+        g.setColor(Color.DARK_GRAY); // Set color to dark gray
+        g.setFont(new Font("Arial", Font.BOLD, 20));
+        g.drawString("Points: " + pointCount, sidebarX + 10, sidebarY + 30); // Display the points
+        g.drawString("Time: " + elapsedTime / 1000.0 + "s", sidebarX + 10, sidebarY + 60); // Display the time
     }
 
     @Override
@@ -179,6 +197,8 @@ public class GamePanel extends JPanel{
 
         g.setColor(Color.BLUE);
         g.fillRect(character.x, character.y, character.width, character.height);
+
+        drawPointsSidebar(g);
     }
 
 
