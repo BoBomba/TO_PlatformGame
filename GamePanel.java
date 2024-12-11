@@ -140,6 +140,7 @@ public class GamePanel extends JPanel{
                     if (point instanceof EndPoint) {
                         // Logika końca gry dla EndPoint
                         endPoint.ending(pointCount, elapsedTime);
+                        timer[0].stop();
                         return; // Zakończ pętlę i timer, jeśli dotknięto EndPoint
                     } else {
                         // Logika dla zwykłego punktu
