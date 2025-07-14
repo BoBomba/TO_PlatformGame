@@ -16,7 +16,6 @@ public class Character {
     Color color = Color.pink;
 
 
-    KillingPlatformDecorator killingPlatform;
 
     public Character(int x, int y, int width, int height) {
         this.x = x;
@@ -52,7 +51,7 @@ public class Character {
 
         for (Platform platform : platforms) {
             if (checkCollision(potentialX, potentialY, platform)) {
-                if (!platforms.contains(killingPlatform)) {
+                if (!(platform instanceof KillingPlatformDecorator)) {
                     collided = true;
                     yVelocity = 0;
                     if (potentialY > y) { // Postać spada na platformę
