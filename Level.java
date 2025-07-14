@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Level {
 
-    // mozliwe zastosowanie fabryki do tworzenia np. roznych poziomow
+    // możliwe zastosowanie fabryki do tworzenia np. roznych poziomow
 
     private static int levelNumber;
 
