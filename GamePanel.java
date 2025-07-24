@@ -90,13 +90,26 @@ public class GamePanel extends JPanel{
         lvl2.addPlatform(new Platform(600, 350, 250, 10));
 
         Level lvl3 = new Level(3);
-        lvl3.addPoint(new Point(200, 300));
-        lvl3.addPlatform(new Platform(0, 350, 800, 10));
+        lvl3.addPlatform(new Platform(50, 250, 150, 10));
+        lvl3.addPlatform(new Platform(300, 200, 150, 10));
+        lvl3.addPoint(new Point(450, 150));
+        lvl3.addPlatform(new Platform(650, 300, 100, 10));
 
-        lvl3.addPlatform(killingPlatform);
+        Level lvl4 = new Level(4);
+        lvl4.addPlatform(new Platform(0, 320, 120, 10));
+        lvl4.addPlatform(new Platform(220, 270, 120, 10));
+        lvl4.addPlatform(new Platform(440, 220, 120, 10));
+        lvl4.addPoint(new Point(600, 170));
+        lvl4.addPlatform(killingPlatform);
+
+        Level finalLvl = new Level(5);
+        finalLvl.addPoint(new Point(200, 300));
+        finalLvl.addPlatform(new Platform(0, 350, 800, 10));
+
+        finalLvl.addPlatform(killingPlatform);
 
         EndPoint endPoint = new EndPoint(700, 220);
-        lvl3.addPoint(endPoint);
+        finalLvl.addPoint(endPoint);
 
         lvl1.loadLevel(this);
         //lvl3.loadLevel(this);
@@ -123,6 +136,16 @@ public class GamePanel extends JPanel{
                 }
                 else if (levelNumber == 2) {
                     lvl3.loadLevel(this);
+                    character.x = 0;
+                    levelNumber++;
+                }
+                else if (levelNumber == 3) {
+                    lvl4.loadLevel(this);
+                    character.x = 0;
+                    levelNumber++;
+                }
+                else if (levelNumber == 4) {
+                    finalLvl.loadLevel(this);
                     character.x = 0;
                     levelNumber++;
                 }
