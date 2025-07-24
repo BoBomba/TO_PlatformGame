@@ -98,7 +98,7 @@ public class GamePanel extends JPanel{
         Level lvl4 = new Level(4);
         lvl4.addPlatform(new Platform(0, 320, 120, 10));
         lvl4.addPlatform(new Platform(220, 270, 120, 10));
-        lvl4.addPlatform(new Platform(440, 220, 120, 10));
+        lvl4.addPlatform(new Platform(460, 220, 120, 10));
         lvl4.addPoint(new Point(600, 170));
         lvl4.addPlatform(killingPlatform);
 
