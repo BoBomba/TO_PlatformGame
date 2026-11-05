@@ -9,4 +9,4 @@ javac -d build/classes $(find . -maxdepth 1 -name '*.java')
 javac -cp lib/junit-4.13.2.jar:lib/hamcrest-core-1.3.jar:build/classes -d build/test-classes $(find src/test/java -name '*.java')
 
 # Run tests
-java -cp build/classes:build/test-classes:lib/junit-4.13.2.jar:lib/hamcrest-core-1.3.jar org.junit.runner.JUnitCore CharacterMementoTest
+java -cp build/classes:build/test-classes:lib/junit-4.13.2.jar:lib/hamcrest-core-1.3.jar org.junit.runner.JUnitCore CharacterMementoTest CharacterCollisionTest LevelGeneratorTest HighScoreStoreTest

@@ -1,21 +1,19 @@
-import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 
 public class Level {
-
-    // możliwe zastosowanie fabryki do tworzenia np. roznych poziomow
-
-    private static int levelNumber;
-
-    private List<Platform> platforms;
-
-    private List<Point> points;
+    private final int levelNumber;
+    private final List<Platform> platforms;
+    private final List<Point> points;
 
     public Level(int levelNumber) {
         platforms = new ArrayList<>();
         points = new ArrayList<>();
         this.levelNumber = levelNumber;
+    }
+
+    public int getLevelNumber() {
+        return levelNumber;
     }
 
     public void addPlatform(Platform platform) {
@@ -32,12 +30,15 @@ public class Level {
     }
 
     public List<Platform> getPlatforms() {
-        return platforms;
+        return new ArrayList<>(platforms);
+    }
+
+    public List<Point> getPoints() {
+        return new ArrayList<>(points);
     }
 
     public void loadLevel(GamePanel gamePanel) {
-        gamePanel.setPlatforms(platforms);
-        gamePanel.setPoints(points);
+        gamePanel.setPlatforms(getPlatforms());
+        gamePanel.setPoints(getPoints());
     }
-
 }

@@ -31,6 +31,15 @@ public class GameWindow extends JFrame {
         return heightWindow;
     }
 
+    public void showStartScreen() {
+        getContentPane().removeAll();
+        StartScreen startScreen = new StartScreen(this);
+        add(startScreen);
+        revalidate();
+        repaint();
+        startScreen.requestFocusInWindow();
+    }
+
     public static void main(String[] args) {
         new GameWindow();
     }

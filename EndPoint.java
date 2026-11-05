@@ -10,10 +10,17 @@ public class EndPoint extends Point {
         this.color = Color.YELLOW; // Złoty kolor
     }
 
-    public void ending(int pointCount, int elapsedTime) {
+    public void ending(int pointCount, int elapsedTime, int deathCount, GameWindow gameWindow) {
         if (!isEndScreenShown) {
             JFrame endFrame = new JFrame("Koniec Gry");
-            endFrame.setContentPane(new EndScreen(pointCount, elapsedTime));
+            endFrame.setContentPane(new EndScreen(
+                    pointCount,
+                    elapsedTime,
+                    deathCount,
+                    () -> {
+                        endFrame.dispose();
+                        gameWindow.showStartScreen();
+                    }));
             endFrame.pack();
             endFrame.setLocationRelativeTo(null); // Ustawienie na środku ekranu
             endFrame.setVisible(true);

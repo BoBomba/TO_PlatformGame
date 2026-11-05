@@ -1,22 +1,31 @@
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.util.List;
 
 public class Character {
+    public static final int DEFAULT_WIDTH = 30;
+    public static final int MOVE_SPEED = 5;
+    public static final int JUMP_VELOCITY = -15;
+    public static final int GRAVITY = 1;
+
+    public static int maximumJumpHeight() {
+        int velocity = JUMP_VELOCITY;
+        int displacement = 0;
+        int height = 0;
+        while (velocity < 0) {
+            displacement += velocity;
+            height = Math.max(height, -displacement);
+            velocity += GRAVITY;
+        }
+        return height;
+    }
+
     int x, y;
     int width, height;
-    int xVelocity, yVelocity; //strategia ??
+    int xVelocity, yVelocity;
     boolean onGround;
 
     private boolean movingLeft = false;
     private boolean movingRight = false;
     private boolean jumping = false;
-
-    Color color = Color.pink;
-
-
-    KillingPlatformDecorator killingPlatform;
 
     public Character(int x, int y, int width, int height) {
         this.x = x;
@@ -31,45 +40,48 @@ public class Character {
     public void update(List<Platform> platforms) {
 
         if (movingLeft) {
-            xVelocity = -5;
+            xVelocity = -MOVE_SPEED;
         } else if (movingRight) {
-            xVelocity = 5;
+            xVelocity = MOVE_SPEED;
         } else {
             xVelocity = 0;
         }
 
         if (jumping && onGround) {
-            yVelocity = -15; // Wartość skoku
+            yVelocity = JUMP_VELOCITY;
             onGround = false;
         }
 
+        int previousBottom = y + height;
         x += xVelocity;
         y += yVelocity;
 
-        int potentialX = x + xVelocity;
-        int potentialY = y + yVelocity;
-        boolean collided = false;
-
-        for (Platform platform : platforms) {
-            if (checkCollision(potentialX, potentialY, platform)) {
-                if (!platforms.contains(killingPlatform)) {
-                    collided = true;
+        boolean landed = false;
+        if (yVelocity >= 0) {
+            for (Platform platform : platforms) {
+                if (!platform.isLethal()
+                        && previousBottom <= platform.y
+                        && y + height >= platform.y
+                        && x < platform.x + platform.width
+                        && x + width > platform.x) {
+                    y = platform.y - height;
                     yVelocity = 0;
-                    if (potentialY > y) { // Postać spada na platformę
-                        y = platform.y - height;
-                    }
+                    landed = true;
                     break;
                 }
-
             }
         }
 
-        // Ograniczenia ekranu
-        if (x < 0) x = 0;
-        if (y < 0) y = 0;
+        if (x < 0) {
+            x = 0;
+        }
+        if (y < 0) {
+            y = 0;
+            yVelocity = 0;
+        }
 
-        if (!collided) {
-            yVelocity += 1; // Grawitacja
+        if (!landed) {
+            yVelocity += GRAVITY;
             onGround = false;
         } else {
             onGround = true;
@@ -96,24 +108,13 @@ public class Character {
         this.onGround = false;
     }
 
-//    public void moveLeft() {
-//        xVelocity = -5;
-//    }
-//
-//    public void moveRight() {
-//        xVelocity = 5;
-//    }
-//
-//    public void stop() {
-//        xVelocity = 0;
-//    }
-//
-//    public void jump() {
-//        if (onGround) {
-//            yVelocity = -15; // Wartość skoku
-//            onGround = false;
-//        }
-//    }
+    public void setPosition(int x, int y) {
+        this.x = x;
+        this.y = y;
+        this.xVelocity = 0;
+        this.yVelocity = 0;
+        this.onGround = false;
+    }
 
     public void moveLeft() {
         movingLeft = true;
@@ -132,10 +133,7 @@ public class Character {
         jumping = true;
     }
 
-    // Wywoływane, gdy klawisz skoku zostanie zwolniony
     public void stopJump() {
         jumping = false;
     }
-
 }
-

@@ -15,4 +15,8 @@ public class Platform {
         g.setColor(Color.GRAY);
         g.fillRect(x, y, width, height);
     }
+
+    public boolean isLethal() {
+        return false;
+    }
 }

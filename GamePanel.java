@@ -1,58 +1,133 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
+import java.io.IOException;
 
-public class GamePanel extends JPanel{
-    private Character character;
+public class GamePanel extends JPanel {
+    private final Character character;
+    private final String seed;
     private Memento initialPosition;
     private List<Platform> platforms;
     private int elapsedTime = 0;
     private List<Point> points;
-
-
-    int levelNumber = 1;
-
-    int pointCount = 0;
+    private final List<Level> levels;
+    private int currentLevelIndex = 0;
+    private int pointCount = 0;
+    private int deathCount = 0;
+    private boolean timingStarted = false;
 
     public GamePanel(Character character) {
+        this(character, 5);
+    }
+
+    public GamePanel(Character character, int levelCount) {
+        this(character, levelCount, Long.toString(System.nanoTime()));
+    }
+
+    public GamePanel(Character character, int levelCount, String seed) {
         this.character = character;
+        this.seed = seed;
         this.initialPosition = character.saveStateToMemento();
 
-        this.setBackground(Color.LIGHT_GRAY);
+        setBackground(Color.LIGHT_GRAY);
         setFocusable(true);
         requestFocusInWindow();
+        bindControls();
 
-        // Definiowanie akcji // wzorzec komenda
+        levels = new LevelGenerator().generateLevels(levelCount, seed);
+        levels.get(currentLevelIndex).loadLevel(this);
+
+        Timer[] timer = new Timer[1];
+        timer[0] = new Timer(16, e -> {
+            character.update(platforms);
+
+            if (character.y > GameWindow.getHeightWindow() - 30 || isTouchingHazard()) {
+                deathCount++;
+                character.getStateFromMemento(initialPosition);
+            }
+
+            if (character.x > GameWindow.getWidthWindow()) {
+                if (currentLevelIndex < levels.size() - 1) {
+                    currentLevelIndex++;
+                    levels.get(currentLevelIndex).loadLevel(this);
+                    Platform startingPlatform = platforms.get(0);
+                    character.setPosition(0, startingPlatform.y - character.height);
+                    initialPosition = character.saveStateToMemento();
+                } else {
+                    character.x = GameWindow.getWidthWindow() - character.width;
+                }
+            }
+
+            Iterator<Point> pointIterator = points.iterator();
+            while (pointIterator.hasNext()) {
+                Point point = pointIterator.next();
+                if (point.checkCollision(character)) {
+                    if (point instanceof EndPoint) {
+                        GameWindow gameWindow = (GameWindow) SwingUtilities.getWindowAncestor(this);
+                        try {
+                            new HighScoreStore().recordResult(
+                                    seed,
+                                    levels.size(),
+                                    elapsedTime,
+                                    pointCount,
+                                    deathCount);
+                        } catch (IOException exception) {
+                            JOptionPane.showMessageDialog(
+                                    this,
+                                    "Nie udało się zapisać wyniku:\n" + exception.getMessage(),
+                                    "Błąd zapisu wyników",
+                                    JOptionPane.ERROR_MESSAGE);
+                        }
+                        ((EndPoint) point).ending(pointCount, elapsedTime, deathCount, gameWindow);
+                        timer[0].stop();
+                        repaint();
+                        return;
+                    }
+                    pointIterator.remove();
+                    pointCount++;
+                }
+            }
+
+            if (timingStarted) {
+                elapsedTime += 16;
+            }
+            repaint();
+        });
+        timer[0].start();
+    }
+
+    private void bindControls() {
         Action moveLeftAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                timingStarted = true;
                 character.moveLeft();
             }
         };
-
         Action moveRightAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                timingStarted = true;
                 character.moveRight();
             }
         };
-
         Action stopAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 character.stop();
             }
         };
-
         Action jumpAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                timingStarted = true;
                 character.jump();
             }
         };
-
         Action stopJumpAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -60,132 +135,29 @@ public class GamePanel extends JPanel{
             }
         };
 
-        // Mapowanie klawiszy
         bindKeyStrokeToAction("LEFT", moveLeftAction);
         bindKeyStrokeToAction("RIGHT", moveRightAction);
         bindKeyStrokeToAction("UP", jumpAction);
         bindKeyStrokeToAction("released LEFT", stopAction);
         bindKeyStrokeToAction("released RIGHT", stopAction);
         bindKeyStrokeToAction("released UP", stopJumpAction);
+    }
 
-
-        //Edytor leveli
-        KillingPlatformDecorator killingPlatform = new KillingPlatformDecorator(new Platform(400,250,10,100));
-
-        Level lvl1 = new Level(1);
-        lvl1.addPlatform(new Platform(25, 200, 200, 10));
-        lvl1.addPlatform(new Platform(350, 300, 200, 10));
-
-        lvl1.addPlatform(killingPlatform);
-
-        lvl1.addPoint(new Point(650, 200));
-        lvl1.addPlatform(new Platform(700, 300, 100, 10));
-
-
-        Level lvl2 = new Level(2);
-        lvl2.addPlatform(new Platform(0, 300, 100, 10));
-        lvl2.addPlatform(new Platform(200, 250, 100, 10));
-        lvl2.addPlatform(new Platform(400, 400, 130, 10));
-        lvl2.addPoint(new Point(650, 300));
-        lvl2.addPlatform(new Platform(600, 350, 250, 10));
-
-        Level lvl3 = new Level(3);
-        lvl3.addPlatform(new Platform(50, 250, 150, 10));
-        lvl3.addPlatform(new Platform(300, 200, 150, 10));
-        lvl3.addPoint(new Point(450, 150));
-        lvl3.addPlatform(new Platform(650, 300, 100, 10));
-
-        Level lvl4 = new Level(4);
-        lvl4.addPlatform(new Platform(0, 320, 120, 10));
-        lvl4.addPlatform(new Platform(220, 270, 120, 10));
-        lvl4.addPlatform(new Platform(460, 220, 120, 10));
-        lvl4.addPoint(new Point(600, 170));
-        lvl4.addPlatform(killingPlatform);
-
-        Level finalLvl = new Level(5);
-        finalLvl.addPoint(new Point(200, 300));
-        finalLvl.addPlatform(new Platform(0, 350, 800, 10));
-
-        finalLvl.addPlatform(killingPlatform);
-
-        EndPoint endPoint = new EndPoint(700, 220);
-        finalLvl.addPoint(endPoint);
-
-        lvl1.loadLevel(this);
-        //lvl3.loadLevel(this);
-        //levelNumber = 3;
-
-        Timer[] timer = new Timer[1];
-
-        timer[0] = new Timer(16, e -> {
-            character.update(platforms);
-            if (character.y > GameWindow.getHeightWindow()-30) {
-                character.getStateFromMemento(initialPosition);
+    private boolean isTouchingHazard() {
+        for (Platform platform : platforms) {
+            if (platform.isLethal() && character.checkCollision(character.x, character.y, platform)) {
+                return true;
             }
-
-            if (character.checkCollision(character.x, character.y, killingPlatform)) {
-                KillingPlatformDecorator.resetCharacter(character, initialPosition);
-            }
-
-            if (character.x > GameWindow.getWidthWindow()) {
-                if (levelNumber == 1){
-                    // Przejście do kolejnego poziomu
-                    lvl2.loadLevel(this);
-                    character.x = 0;
-                    levelNumber++;
-                }
-                else if (levelNumber == 2) {
-                    lvl3.loadLevel(this);
-                    character.x = 0;
-                    levelNumber++;
-                }
-                else if (levelNumber == 3) {
-                    lvl4.loadLevel(this);
-                    character.x = 0;
-                    levelNumber++;
-                }
-                else if (levelNumber == 4) {
-                    finalLvl.loadLevel(this);
-                    character.x = 0;
-                    levelNumber++;
-                }
-                else {
-                    timer[0].stop();
-                    endPoint.ending(pointCount, elapsedTime);
-                }
-            }
-
-            // zbieranie punktów / iterator
-            Iterator<Point> pointIterator = points.iterator();
-            while (pointIterator.hasNext()) {
-                Point point = pointIterator.next();
-                if (point.checkCollision(character)) {
-                    if (point instanceof EndPoint) {
-                        // Logika końca gry dla EndPoint
-                        endPoint.ending(pointCount, elapsedTime);
-                        timer[0].stop();
-                        return; // Zakończ pętlę i timer, jeśli dotknięto EndPoint
-                    } else {
-                        // Logika dla zwykłego punktu
-                        pointIterator.remove();  // Bezpieczne usunięcie punktu
-                        pointCount++;
-                    }
-                }
-            }
-
-            elapsedTime += 16;
-
-            repaint();
-        });
-        timer[0].start();
+        }
+        return false;
     }
 
     public void setPlatforms(List<Platform> platforms) {
-        this.platforms = platforms;
+        this.platforms = new ArrayList<>(platforms);
     }
 
     public void setPoints(List<Point> points) {
-        this.points = points;
+        this.points = new ArrayList<>(points);
     }
 
     private void bindKeyStrokeToAction(String keyStroke, Action action) {
@@ -193,18 +165,38 @@ public class GamePanel extends JPanel{
         getActionMap().put(keyStroke, action);
     }
 
-    public void drawPointsSidebar(Graphics g) {
-        g.setColor(new Color(0, 0, 0, 0)); // Set color to transparent
-        int sidebarWidth = 100;
-        int sidebarHeight = 50;
-        int sidebarX = GameWindow.getWidthWindow() - sidebarWidth; // Position the sidebar on the right
-        int sidebarY = 0; // Position the sidebar at the top
-        g.fillRect(sidebarX, sidebarY, sidebarWidth, sidebarHeight); // Draw the sidebar
-
-        g.setColor(Color.DARK_GRAY); // Set color to dark gray
+    private void drawPointsSidebar(Graphics g) {
+        g.setColor(Color.DARK_GRAY);
         g.setFont(new Font("Arial", Font.BOLD, 20));
-        g.drawString("Points: " + pointCount, sidebarX + 10, sidebarY + 30); // Display the points
-        g.drawString("Time: " + elapsedTime / 1000.0 + "s", sidebarX + 10, sidebarY + 60); // Display the time
+        FontMetrics metrics = g.getFontMetrics();
+        int rightEdge = getWidth() - 20;
+        String pointsText = "Points: " + pointCount;
+        String timeText = String.format(Locale.ROOT, "Time: %.2fs", elapsedTime / 1000.0);
+        String deathsText = "Deaths: " + deathCount;
+        g.drawString(pointsText, rightEdge - metrics.stringWidth(pointsText), 30);
+        g.drawString(timeText, rightEdge - metrics.stringWidth(timeText), 60);
+        g.drawString(deathsText, rightEdge - metrics.stringWidth(deathsText), 90);
+    }
+
+    private void drawLevelIndicator(Graphics g) {
+        Graphics2D graphics = (Graphics2D) g.create();
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        String label = "" + levels.get(currentLevelIndex).getLevelNumber();
+        Font font = new Font(Font.DIALOG, Font.BOLD, 16);
+        graphics.setFont(font);
+        FontMetrics metrics = graphics.getFontMetrics();
+        int paddingX = 14;
+        int badgeHeight = 36;
+        int badgeWidth = metrics.stringWidth(label) + paddingX * 2;
+        int x = 20;
+        int y = 20;
+
+        graphics.setColor(new Color(235, 235, 235, 225));
+        graphics.fillRoundRect(x, y, badgeWidth, badgeHeight, badgeHeight, badgeHeight);
+        graphics.setColor(new Color(70, 70, 70));
+        graphics.drawString(label, x + paddingX, y + (badgeHeight - metrics.getHeight()) / 2 + metrics.getAscent());
+        graphics.dispose();
     }
 
     @Override
@@ -214,17 +206,13 @@ public class GamePanel extends JPanel{
         for (Platform platform : platforms) {
             platform.draw(g);
         }
-
         for (Point point : points) {
             point.draw(g);
         }
 
         g.setColor(Color.BLUE);
         g.fillRect(character.x, character.y, character.width, character.height);
-
         drawPointsSidebar(g);
+        drawLevelIndicator(g);
     }
-
-
 }
-

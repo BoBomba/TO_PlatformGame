@@ -1,23 +1,20 @@
 import java.awt.Color;
 import java.awt.Graphics;
 
-// dekorator
-
 public class KillingPlatformDecorator extends Platform {
-    private Platform decoratedPlatform;
-
-    boolean killing = true;
-
-    public KillingPlatformDecorator(Platform decoratedPlatform) {
-        super(decoratedPlatform.x, decoratedPlatform.y, decoratedPlatform.width, decoratedPlatform.height);
-        this.decoratedPlatform = decoratedPlatform;
+    public KillingPlatformDecorator(Platform platform) {
+        super(platform.x, platform.y, platform.width, platform.height);
     }
 
     @Override
     public void draw(Graphics g) {
-        // Rysowanie platformy w kolorze czerwonym
         g.setColor(Color.RED);
         g.fillRect(x, y, width, height);
+    }
+
+    @Override
+    public boolean isLethal() {
+        return true;
     }
 
     public static void resetCharacter(Character character, Memento savedState) {
